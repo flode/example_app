@@ -13,12 +13,15 @@ require 'spec_helper'
 
 describe User do
   before do
-    @user = User.new(name: "Flo", email: "flo@f.de")
+    @user = User.new(name: "Flo", email: "flo@f.de", password: "foobar", password_confirmation: "foobar")
   end
 
   subject {@user}
-  it { should respond_to(:name)}
-  it {should respond_to(:email)}
+  it { should respond_to(:name) }
+  it { should respond_to(:email) }
+  it { should respond_to(:password_digest) }
+  it { should respond_to(:password) }
+  it { should respond_to(:password_confirmation) }
 
   it {should be_valid}
 
@@ -45,5 +48,31 @@ describe User do
         @user.should be_valid
        end
      end
+  end
+  describe "password not present" do
+    before {@user.password = @user.password_confirmation = " "}
+    it {should_not be_valid}
+  end
+  describe "password confirmation does not match" do
+    before {@user.password_confirmation = "other"}
+    it { should_not be_valid }
+  end
+  describe "password_confirmation is nil" do
+    before { @user.password_confirmation = nil }
+    it {should_not be_valid }
+  end
+
+  describe "authenticate works" do
+    before { @user.save }
+    let ( :found_user ) {User.find_by_email(@user.email) }
+
+    describe "with valid password" do
+      it {should == found_user.authenticate(@user.password) }
+    end
+    describe "with invalid password" do
+      let(:user_for_invalid_password) { @user.authenticate("invalid") }
+      it { should_not == user_for_invalid_password }
+      specify { user_for_invalid_password.should be_false }
+    end
   end
 end
