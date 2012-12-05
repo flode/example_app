@@ -17,9 +17,16 @@ class StaticPagesController < ApplicationController
   def shuffle_tableau(s)
     for i in 1..(s.length-1)
 	s[i]=s[i].to_s.shuffle
-end
-s
+	end
+	s
   end
-def help
-end
+	def help
+	end
+
+	def contact
+	end
+
+	def about
+	end
+
 end
